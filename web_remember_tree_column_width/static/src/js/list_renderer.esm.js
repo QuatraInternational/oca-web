@@ -16,6 +16,8 @@ import {useDebounced} from "@web/core/utils/timing";
  */
 export function useMagicColumnWidths(tableRef, getState, orig) {
     const renderer = useComponent();
+    // This variable is added for compatibility with our custom rowno-in-tree widget
+    const hasSelectorUsedOffset = renderer.constructor.hasSelectorUsedOffset || 1;
 
     /**
      * Override on onStartResize as returned from upstream's useMagicColumnWidths.
@@ -68,7 +70,7 @@ export function useMagicColumnWidths(tableRef, getState, orig) {
         const headers = [...table.querySelectorAll("thead th")];
         const state = getState();
         const resModel = state.model.config.resModel;
-        const columnOffset = state.hasSelectors ? 1 : 0;
+        const columnOffset = state.hasSelectors ? hasSelectorUsedOffset : 0;
         headers.forEach((el, elIndex) => {
             var column = state.columns[elIndex - columnOffset];
             const fieldName = (column && column.name) || "";
