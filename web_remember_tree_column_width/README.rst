@@ -36,13 +36,6 @@ grouping, or reordering.
 .. contents::
    :local:
 
-Known issues / Roadmap
-======================
-
-In certain cases, an event may pass a th element that cannot be used to
-retrieve the corresponding td element. When this happens, the modified
-column width is not stored.
-
 Bug Tracker
 ===========
 
@@ -64,13 +57,13 @@ Authors
 Contributors
 ------------
 
-- Francisco Javier Luna Vázquez <fluna@vauxoo.com>
-- Tomás Álvarez <tomas@vauxoo.com>
-- `Komit <https://komit-consulting.com/>`__:
+-  Francisco Javier Luna Vázquez <fluna@vauxoo.com>
+-  Tomás Álvarez <tomas@vauxoo.com>
+-  `Komit <https://komit-consulting.com/>`__:
 
-  - Cuong Nguyen Mtm <cuong.nmtm@komit-consulting.com>
+   -  Cuong Nguyen Mtm <cuong.nmtm@komit-consulting.com>
 
-- Jasmin Solanki <jasmin.solanki@forgeflow.com>
+-  Jasmin Solanki <jasmin.solanki@forgeflow.com>
 
 Maintainers
 -----------
