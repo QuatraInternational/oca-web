@@ -16,21 +16,19 @@ import {useDebounced} from "@web/core/utils/timing";
  */
 export function useMagicColumnWidths(tableRef, getState, orig) {
     const renderer = useComponent();
-    // This variable is added for compatibility with our custom rowno-in-tree widget
-    const hasSelectorUsedOffset = renderer.constructor.hasSelectorUsedOffset || 1;
 
     /**
      * Override on onStartResize as returned from upstream's useMagicColumnWidths.
      * We call super, then add event listeners for our own stopResize handler
      * which stores column widths in the brower's localstorage.
      */
-    function onStartResize(evstart) {
+    function onStartResize(ev) {
         // Call original method
-        const res = this.columnWidths.onStartResizeOrig(evstart);
+        const res = this.columnWidths.onStartResizeOrig(ev);
         const resizeStoppingEvents = ["keydown", "pointerdown", "pointerup"];
 
         // Mouse or keyboard events : stop resize
-        const stopResize = (evstop) => {
+        const stopResize = (evstart) => (evstop) => {
             // Ignores the 'left mouse button down' event as it used to start resizing
             if (evstop.type === "pointerdown" && evstop.button === 0) {
                 return;
@@ -38,7 +36,7 @@ export function useMagicColumnWidths(tableRef, getState, orig) {
             evstop.preventDefault();
             evstop.stopPropagation();
 
-            const th = evstop.target.closest("th");
+            const th = evstart.target.closest("th");
             if (th === null || th === undefined) {
                 return;
             }
@@ -53,11 +51,14 @@ export function useMagicColumnWidths(tableRef, getState, orig) {
                 );
             }
             for (const eventType of resizeStoppingEvents) {
-                window.removeEventListener(eventType, stopResize);
+                window.removeEventListener(eventType, evstart.stopResizeWrapper);
             }
         };
+        // Patch the event listener method onto the event that is being passed
+        // to it, so that we can remove it from within the method.
+        ev.stopResizeWrapper = stopResize(ev);
         for (const eventType of resizeStoppingEvents) {
-            window.addEventListener(eventType, stopResize);
+            window.addEventListener(eventType, ev.stopResizeWrapper);
         }
         return res;
     }
@@ -70,7 +71,7 @@ export function useMagicColumnWidths(tableRef, getState, orig) {
         const headers = [...table.querySelectorAll("thead th")];
         const state = getState();
         const resModel = state.model.config.resModel;
-        const columnOffset = state.hasSelectors ? hasSelectorUsedOffset : 0;
+        const columnOffset = state.hasSelectors ? 1 : 0;
         headers.forEach((el, elIndex) => {
             var column = state.columns[elIndex - columnOffset];
             const fieldName = (column && column.name) || "";
